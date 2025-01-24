@@ -1,0 +1,337 @@
+openapi: 3.0.3
+info:
+  title: drf-sample-api
+  version: 1.0.0
+  description: This is simple api with authtoken, base on drf and django.
+paths:
+  /admin-article/{slug}/active_article/:
+    post:
+      operationId: admin_article_active_article_create
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - admin-article
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminArticles'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminArticles'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminArticles'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminArticles'
+          description: ''
+  /admin-article/articles/:
+    get:
+      operationId: admin_article_articles_retrieve
+      tags:
+      - admin-article
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminArticles'
+          description: ''
+  /articles/:
+    get:
+      operationId: articles_list
+      tags:
+      - articles
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+          description: ''
+  /articles/{slug}/:
+    get:
+      operationId: articles_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - articles
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+          description: ''
+  /token/login/:
+    post:
+      operationId: token_login_create
+      description: |-
+        This method is use for generating new token,
+        if user does not have token or it is expired.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin'
+          description: ''
+  /token/refresh/:
+    put:
+      operationId: token_refresh_update
+      description: This method is use for refreshing token.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin'
+          description: ''
+  /user-article/:
+    get:
+      operationId: user_article_list
+      description: this method return user articles list.
+      tags:
+      - user-article
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+          description: ''
+    post:
+      operationId: user_article_create
+      description: this method create article base on user.
+      tags:
+      - user-article
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Article'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Article'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Article'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+          description: ''
+  /user-article/{slug}/:
+    get:
+      operationId: user_article_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - user-article
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+          description: ''
+    put:
+      operationId: user_article_update
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - user-article
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Article'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Article'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Article'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+          description: ''
+    delete:
+      operationId: user_article_destroy
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - user-article
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    AdminArticles:
+      type: object
+      properties:
+        title:
+          type: string
+          readOnly: true
+          description: Title should be unique and under 128 char.
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-\w]+$
+        is_active:
+          type: boolean
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - is_active
+      - slug
+      - title
+      - user
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          description: Title should be unique and under 128 char.
+          maxLength: 128
+        json_body:
+          description: All content of body should be save base on json.
+        pub_date:
+          type: string
+          format: date-time
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-\w]+$
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - json_body
+      - slug
+      - title
+      - user
+    UserLogin:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 64
+        password:
+          type: string
+          maxLength: 32
+      required:
+      - password
+      - username
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
