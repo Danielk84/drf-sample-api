@@ -1,6 +1,5 @@
 from http import HTTPMethod
 
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import authenticate
 from rest_framework import viewsets, status, permissions
@@ -64,15 +63,18 @@ class BaseTokenAuthViewSet(viewsets.ViewSet):
         if response:
             return response
 
-        if self.model.objects.filter(user=user).exists():
-            token = get_object_or_404(self.model, user=user)
-            if token.is_expired:
-                token.delete()
+        try:
+            if self.model.objects.filter(user=user).exists():
+                token = self.model.objects.get(user=user)
+                if token.is_expired:
+                    token.delete()
+                    token = self.model.objects.create(user=user)
+            else:
                 token = self.model.objects.create(user=user)
-        else:
-            token = self.model.objects.create(user=user)
 
-        return Response({"Token": "Token " + token.key})
+            return Response({"Token": "Token " + token.key})
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=False, methods=[HTTPMethod.PUT])
     def refresh(self, request, format=True):
@@ -93,9 +95,11 @@ class BaseTokenAuthViewSet(viewsets.ViewSet):
 
 
 class ArticleListViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Article.objects.published()
     serializer_class = ArticleSerializer
     lookup_field = "slug"
+
+    def get_queryset(self):
+        return Article.objects.published()
 
 
 def get_user_from_token(request) -> tuple:
@@ -119,9 +123,6 @@ class UserArticleViewSet(viewsets.ViewSet):
     lookup_field = 'slug'
 
     def list(self, request, format=True):
-        """
-            this method return user articles list.
-        """
         response, user = get_user_from_token(request)
 
         if response:
@@ -132,9 +133,6 @@ class UserArticleViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request, format=None):
-        """
-            this method create article base on user.
-        """
         response, user = get_user_from_token(request)
 
         if response:
@@ -144,7 +142,6 @@ class UserArticleViewSet(viewsets.ViewSet):
             serializer = self.serializer_class(data=request.data)
             if serializer.is_valid():
                 serializer.save(user=user)
-                print(2)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except:

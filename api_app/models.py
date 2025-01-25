@@ -14,7 +14,6 @@ class ArticleQuerySet(models.QuerySet):
 class Article(models.Model):
     title = models.CharField(
         max_length=128,
-        unique=True,
         help_text=_("Title should be unique and under 128 char."),
     )
     json_body = models.JSONField(
