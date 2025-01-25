@@ -153,7 +153,6 @@ paths:
   /user-article/:
     get:
       operationId: user_article_list
-      description: this method return user articles list.
       tags:
       - user-article
       security:
@@ -169,7 +168,6 @@ paths:
           description: ''
     post:
       operationId: user_article_create
-      description: this method create article base on user.
       tags:
       - user-article
       requestBody:
